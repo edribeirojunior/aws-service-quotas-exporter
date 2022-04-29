@@ -6,7 +6,7 @@ go_library(
     ),
     visibility = ["//..."],
     deps = [
-        "//pkg/service_quotas:servicequotas",
+        "//pkg/servicequotas:servicequotas",
         "//third_party/go:errors",
         "//third_party/go:logrus",
         "//third_party/go:prometheus",
