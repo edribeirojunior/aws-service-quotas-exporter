@@ -5,10 +5,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/edribeirojunior/aws-service-quotas-exporter/pkg/service_quotas/servicequotas"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	logging "github.com/sirupsen/logrus"
-	"github.com/thought-machine/aws-service-quotas-exporter/pkg/service_quotas/servicequotas"
 )
 
 var log = logging.WithFields(logging.Fields{})

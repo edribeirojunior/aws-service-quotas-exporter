@@ -6,8 +6,8 @@
 ; Or you can uncomment the following to pin everyone to a particular version;
 ; when you change it all users will automatically get updated.
 [please]
-version = 15.7.1
-versionchecksum = 9a56c596d6ab2068a7d8b9f7559fb3eb16e0c20059ef272fd51a3bd23e8edfbc
+version = 16.20.0
+versionchecksum = 84bec8b7ce82fd4cd7c161f2503ea6ed5340fd7f924dddf52653c73d9da46a6c
 
 [buildconfig]
 default-docker-repo = hub.docker.com
@@ -19,7 +19,7 @@ sandbox = false
 
 
 [go]
-importpath = github.com/thought-machine/aws-service-quotas-exporter
+importpath = github.com/edribeirojunior/aws-service-quotas-exporter
 gopath = $TMP_DIR:$TMP_DIR/third_party/go:$TMP_DIR/third_party/go/kubernetes
 ; DefaultStatic = false
 ; CgoCCTool = /usr/local/musl/bin/musl-gcc

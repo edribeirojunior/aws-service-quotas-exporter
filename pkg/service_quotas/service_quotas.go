@@ -5,8 +5,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws/client"
 	"github.com/aws/aws-sdk-go/aws/endpoints"
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/autoscaling"
-	"github.com/aws/aws-sdk-go/service/ec2"
+	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/aws/aws-sdk-go/service/ecr"
 	awsservicequotas "github.com/aws/aws-sdk-go/service/servicequotas"
 	"github.com/aws/aws-sdk-go/service/servicequotas/servicequotasiface"
 	"github.com/pkg/errors"
@@ -22,7 +22,8 @@ var (
 )
 
 func allServices() []string {
-	return []string{"ec2", "vpc"}
+	//return []string{"ec2", "vpc", "dynamodb", "ecr"}
+	return []string{"dynamodb", "ecr"}
 }
 
 // UsageCheck is an interface for retrieving service quota usage
@@ -31,25 +32,29 @@ type UsageCheck interface {
 	Usage() ([]QuotaUsage, error)
 }
 
-func newUsageChecks(c client.ConfigProvider, cfgs ...*aws.Config) (map[string]UsageCheck, []UsageCheck) {
+func newUsageChecks(c client.ConfigProvider, cfgs ...*aws.Config) map[string]UsageCheck {
 	// all clients that will be used by the usage checks
-	ec2Client := ec2.New(c, cfgs...)
-	autoscalingClient := autoscaling.New(c, cfgs...)
+	// ec2Client := ec2.New(c, cfgs...)
+	// autoscalingClient := autoscaling.New(c, cfgs...)
+	dynamodbClient := dynamodb.New(c, cfgs...)
+	ecrClient := ecr.New(c, cfgs...)
 
 	serviceQuotasUsageChecks := map[string]UsageCheck{
-		"L-0EA8095F": &RulesPerSecurityGroupUsageCheck{ec2Client},
-		"L-2AFB9258": &SecurityGroupsPerENIUsageCheck{ec2Client},
-		"L-E79EC296": &SecurityGroupsPerRegionUsageCheck{ec2Client},
-		"L-34B43A08": &StandardSpotInstanceRequestsUsageCheck{ec2Client},
-		"L-1216C47A": &RunningOnDemandStandardInstancesUsageCheck{ec2Client},
+		// "L-0EA8095F": &RulesPerSecurityGroupUsageCheck{ec2Client},
+		// "L-2AFB9258": &SecurityGroupsPerENIUsageCheck{ec2Client},
+		// "L-E79EC296": &SecurityGroupsPerRegionUsageCheck{ec2Client},
+		// "L-34B43A08": &StandardSpotInstanceRequestsUsageCheck{ec2Client},
+		// "L-1216C47A": &RunningOnDemandStandardInstancesUsageCheck{ec2Client},
+		"L-5C18ACC4": &MaximumNumberTablesUsageCheck{dynamodbClient},
+		"L-03A36CE1": &ImagesPerRepositoryUsageCheck{ecrClient},
 	}
 
-	otherUsageChecks := []UsageCheck{
-		&AvailableIpsPerSubnetUsageCheck{ec2Client},
-		&ASGUsageCheck{autoscalingClient},
-	}
+	// otherUsageChecks := []UsageCheck{
+	// 	&AvailableIpsPerSubnetUsageCheck{ec2Client},
+	// 	&ASGUsageCheck{autoscalingClient},
+	// }
 
-	return serviceQuotasUsageChecks, otherUsageChecks
+	return serviceQuotasUsageChecks
 }
 
 // QuotaUsage represents service quota usage
@@ -92,7 +97,7 @@ type ServiceQuotas struct {
 	isAwsChina               bool
 	quotasService            servicequotasiface.ServiceQuotasAPI
 	serviceQuotasUsageChecks map[string]UsageCheck
-	otherUsageChecks         []UsageCheck
+	//otherUsageChecks         []UsageCheck
 }
 
 // QuotasInterface is an interface for retrieving AWS service
@@ -121,7 +126,7 @@ func NewServiceQuotas(region, profile string) (QuotasInterface, error) {
 	}
 
 	quotasService := awsservicequotas.New(awsSession, aws.NewConfig().WithRegion(region))
-	serviceQuotasChecks, otherChecks := newUsageChecks(awsSession, aws.NewConfig().WithRegion(region))
+	serviceQuotasChecks := newUsageChecks(awsSession, aws.NewConfig().WithRegion(region))
 
 	if isChina {
 		logging.Warn("AWS china currently doesn't support service quotas, disabling...")
@@ -133,7 +138,7 @@ func NewServiceQuotas(region, profile string) (QuotasInterface, error) {
 		quotasService:            quotasService,
 		serviceQuotasUsageChecks: serviceQuotasChecks,
 		isAwsChina:               isChina,
-		otherUsageChecks:         otherChecks,
+		//otherUsageChecks:         otherChecks,
 	}
 	return quotas, nil
 }
@@ -203,16 +208,16 @@ func (s *ServiceQuotas) QuotasAndUsage() ([]QuotaUsage, error) {
 		}
 	}
 
-	for _, check := range s.otherUsageChecks {
-		quotas, err := check.Usage()
-		if err != nil {
-			return nil, err
-		}
+	// for _, check := range s.otherUsageChecks {
+	// 	quotas, err := check.Usage()
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
 
-		for _, quota := range quotas {
-			allQuotaUsages = append(allQuotaUsages, quota)
-		}
-	}
+	// 	for _, quota := range quotas {
+	// 		allQuotaUsages = append(allQuotaUsages, quota)
+	// 	}
+	// }
 
 	return allQuotaUsages, nil
 }
