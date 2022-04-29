@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/edribeirojunior/core-pks/pkg/servicequotas/servicequotas"
+	"github.com/edribeirojunior/core-pks/pkg/servicequotas"
 )
 
 func resourceName(name string) *string {
