@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/edribeirojunior/aws-service-quotas-exporter/pkg/service_exporter/serviceexporter"
+	exporter "github.com/edribeirojunior/aws-service-quotas-exporter/pkg/exporter"
+
 	"github.com/jessevdk/go-flags"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -23,7 +24,7 @@ var opts struct {
 
 func main() {
 	flags.Parse(&opts)
-	quotasExporter, err := serviceexporter.NewServiceQuotasExporter(opts.Region, opts.Profile, opts.RefreshPeriod, opts.IncludeAWSTags)
+	quotasExporter, err := exporter.NewServiceQuotasExporter(opts.Region, opts.Profile, opts.RefreshPeriod, opts.IncludeAWSTags)
 	if err != nil {
 		log.Fatalf("Failed to create exporter: %s", err)
 	}

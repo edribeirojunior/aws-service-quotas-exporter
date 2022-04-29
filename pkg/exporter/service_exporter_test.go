@@ -1,4 +1,4 @@
-package serviceexporter
+package exporter
 
 import (
 	"sync"
@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/edribeirojunior/aws-service-quotas-exporter/pkg/service_quotas/servicequotas"
+	"github.com/edribeirojunior/core-pks/pkg/servicequotas/servicequotas"
 )
 
 func resourceName(name string) *string {
